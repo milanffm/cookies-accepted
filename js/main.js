@@ -1,129 +1,89 @@
-
-/**
- * Cookie Accept popup function
- */
-
-function coociesAccepted() {
-
-    var _body, _content, _cookieName, _cookieText, _cookieInfoLink, _cookieInfoLinkText, _cookieOk;
-    var _lang = 'de';
-
-    /**
-     * set the language to en if ulrs contains /en/:
-     */
-    if (window.location.pathname.search('/en/') === 0) {
-        _lang = 'en';
+(function(DOC){
+  'use strict';
+  // options : cookie name, labels, links etc - DEFAULTS
+  // **this can be opened as an API later, so that client has an option to set
+  // this up
+  var options = {
+    cookieName : 'cookiesAccepted',
+    cookieValue : true,
+    cookieValidForDays : 365,
+    lang : {
+        default : 'de',
+        switchFromURL : true,
+        switches : [
+          {en : '/en/'},
+          //{it : '/it'} // make sure there us a i18n for this new switch
+        ],
+    },
+    i18n:{
+      de:{
+        cookieText : 'Cookies erleichtern die Nutzung dieser Website. Wenn Sie diese Website nutzen, erklären Sie sich damit einverstanden, dass wir Cookies verwenden.',
+        cookieInfoLink : 'datenschutz.html',
+        cookieInfoLinkTxt : 'weitere Informationen',
+        accept : 'ok'
+      },
+      en:{
+        cookieText : 'This web page uses Cookies for an actual representation of many contents.',
+        cookieInfoLink : 'datenschutz.html',
+        cookieInfoLinkTxt : 'more information',
+        accept : 'ok'
+      }
+    }  
+  }
+  
+  // set Cookie
+  function setCookie() {
+      var date = new Date();
+      date.setTime(date.getTime() + (options.cookieValidForDays * 24 * 60 * 60 * 1000));
+      DOC.cookie = options.cookieName + '=' + options.cookieValue + '; expires=' + date.toGMTString() + '; path=/';
+      return this;
     }
 
-    _body = document.querySelector('body');
-    _content = document.createElement('div');
-    _cookieName = 'cookiesAccepted';
-    _cookieText = {
-        de: 'Cookies erleichtern die Nutzung dieser Website. Wenn Sie diese Website nutzen, erklären Sie sich damit einverstanden, dass wir Cookies verwenden.',
-        en: 'This web page uses Cookies for an actual representation of many contents.'
-    };
-    _cookieInfoLink = {
-        de: 'datenschutz.html',
-        en: 'datenschutz.html'
-    };
-    _cookieInfoLinkText = {
-        de: 'weitere Informationen',
-        en: 'more information'
-    };
-    _cookieOk = {
-        de: 'ok',
-        en: 'ok'
-    };
+  // set Cookie  
+  // returns true / null
+  function getCookie() {
+      var theCookie = DOC.cookie.split(';').filter(function(ck){
+        return ck.indexOf(options.cookieName) >= 0
+      });
+      return theCookie.length > 0 ? theCookie[0].split("=").pop() : null;
+  }
 
-    /**
-     * create Cookie
-     * @param name
-     * @param value
-     * @param days
-     */
-    function createCookie(name, value, days) {
-        var expires;
-        if (days) {
-            var date = new Date();
-            date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-            expires = '; expires=' + date.toGMTString();
-        }
-        else {
-            expires = '';
+  // create cookie popup
+  // **DOM elements creation process can be save in a template, this will allow
+  // clients to configure the look and feel completely
+  function createPopup(lang){
+    var body = DOC.querySelector('body');
+    var container = DOC.createElement('div');
+    container.classList.add('accept-cookies');
+    var paragraph = DOC.createElement('p');
+    paragraph.innerHTML = options.i18n[lang].cookieText;
+    var link = DOC.createElement('a');
+    link.setAttribute('href',options.i18n[lang].cookieInfoLink);
+    link.innerHTML = options.i18n[lang].cookieInfoLinkTxt;
+    var okButton = DOC.createElement('span');
+    okButton.classList.add('cookie-ok');
+    okButton.innerHTML=options.i18n[lang].accept;
+    okButton.addEventListener('click', function(){
+       setCookie();
+       body.removeChild(container);
+    });
+    container.appendChild(paragraph);
+    container.appendChild(link)
+    container.appendChild(okButton);
+    body.appendChild(container);
+  }
 
-        }
-        document.cookie = name + '=' + value + expires + '; path=/';
-    }
-
-    /**
-     * read Cookie
-     * @param name
-     * @returns {*}
-     */
-    function readCookie(name) {
-        var nameEQ = name + '=';
-        var ca = document.cookie.split(';');
-        for (var i = 0; i < ca.length; i++) {
-            var c = ca[i];
-            while (c.charAt(0) === ' ') {
-                c = c.substring(1, c.length);
-            }
-            if (c.indexOf(nameEQ) === 0) {
-                return c.substring(nameEQ.length, c.length);
-            }
-        }
-        return null;
-    }
-
-    /**
-     * create Cookie Popup
-     */
-
-    function createPopup() {
-
-        if (readCookie(_cookieName)) {
-            console.log('cookie set');
-            return
-        }
-
-        var _text = document.createElement('p'),
-            _aInfo = document.createElement('a'),
-            _ok = document.createElement('span');
-
-        // set dom Elements
-        _ok.classList.add('cookie-ok');
-        _content.classList.add('accept-cookies');
-        _aInfo.setAttribute('href', _cookieInfoLink[_lang]);
-        _aInfo.innerHTML = _cookieInfoLinkText[_lang];
-        _ok.innerHTML = _cookieOk[_lang];
-        _text.innerHTML = _cookieText[_lang];
-        _content.appendChild(_text);
-        _content.appendChild(_aInfo);
-        _content.appendChild(_ok);
-        _body.appendChild(_content);
-
-        // add Eventlistener
-        _ok.addEventListener('click', closePopup);
-
-    }
-
-    /**
-     * set cookie and close popup
-     */
-    function closePopup() {
-        _body.removeChild(_content);
-        createCookie(_cookieName, true, 365)
-    }
-
-    createPopup();
-
-    console.log(_cookieName, readCookie(_cookieName));
-
+// check the cookie and render the popup
+if(!getCookie()){
+  // get the default language
+  var lang = options.lang.default;
+  // if switchFromURL is true, lop through switches
+  if(options.lang.switchFromURL){
+    var matchedLang = options.lang.switches.filter(function(swtch){
+        return window.location.pathname.search(Object.keys(swtch)[0] ) > 0
+    });
+    lang = matchedLang.length > 0 ? Object.keys(matchedLang[0])[0] : lang;
+  }
+  createPopup(lang);
 }
-
-/**
- * load the function after DOM is loaded
- */
-document.addEventListener("DOMContentLoaded", function() {
-    coociesAccepted()
-});
+})(document);
