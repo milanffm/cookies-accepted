@@ -1,11 +1,5 @@
 # cookies-accepted
 simple vanilla javascript popup to accept cookies
-Originally developed by @milanffm (https://github.com/milanffm/cookies-accepted)
-This a bit updated version with the same functionality 
-## Why update
-- Avoiding vars, function n global namespace
-- Add example for a different language i.e. en
-- more modular approach
 
 ## How to Use it
 - simply add the main.js file to your page
