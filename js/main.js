@@ -52,7 +52,6 @@
     // **DOM elements creation process can be save in a template, this will allow
     // clients to configure the look and feel completely
     function createPopup(lang) {
-        debugger;
         var body = DOC.querySelector('body');
         var container = DOC.createElement('div');
         var paragraph = DOC.createElement('p');
