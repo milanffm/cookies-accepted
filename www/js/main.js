@@ -36,14 +36,14 @@
         var date = new Date();
         date.setTime(date.getTime() + (options.cookieValidForDays * 24 * 60 * 60 * 1000));
         DOC.cookie = options.cookieName + '=' + options.cookieValue + '; expires=' + date.toGMTString() + '; path=/';
-        return this;
+    
     }
 
     // set Cookie
     // returns true / null
     function getCookie() {
         var theCookie = DOC.cookie.split(';').filter(function (ck) {
-            return ck.indexOf(options.cookieName) >= 0
+            return ck.indexOf(options.cookieName) >= 0;
         });
         return theCookie.length > 0 ? theCookie[0].split("=").pop() : null;
     }
@@ -69,7 +69,7 @@
             body.removeChild(container);
         });
         container.appendChild(paragraph);
-        container.appendChild(link)
+        container.appendChild(link);
         container.appendChild(okButton);
         body.appendChild(container);
     }
@@ -78,10 +78,11 @@
     if (!getCookie()) {
         // get the default language
         var lang = options.lang.default;
+        console.log(lang);
         // if switchFromURL is true, lop through switches
         if (options.lang.switchFromURL) {
             var matchedLang = options.lang.switches.filter(function (swtch) {
-                return window.location.pathname.search(Object.keys(swtch)[0]) > 0
+                return window.location.pathname.search(Object.keys(swtch)[0]) > 0;
             });
             lang = matchedLang.length > 0 ? Object.keys(matchedLang[0])[0] : lang;
         }
