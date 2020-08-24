@@ -35,8 +35,8 @@
     function setCookie() {
         var date = new Date();
         date.setTime(date.getTime() + (options.cookieValidForDays * 24 * 60 * 60 * 1000));
-        DOC.cookie = options.cookieName + '=' + options.cookieValue + '; expires=' + date.toGMTString() + '; path=/';
-    
+        DOC.cookie = options.cookieName + '=' + options.cookieValue + '; expires=' + date.toGMTString() + '; path=/' + ';SameSite=Lax';
+
     }
 
     // set Cookie
